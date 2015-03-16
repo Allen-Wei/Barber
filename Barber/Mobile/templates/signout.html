@@ -1,0 +1,15 @@
+﻿<div class="row">
+    <div class="col-xs-12" ng-show="Body.User.isLogin">
+        <h5>
+            你当前登陆用户是
+            <b>
+                {{Body.User.user.Name}}
+            </b>
+        </h5>
+        <button ng-click="main.signOut()">退出</button>
+    </div>
+    <div class="col-xs-12" ng-hide="Body.User.isLogin">
+        <p>你现在处于未登录状态</p>
+        <a href="#/sign/login" class="btn btn-default">登陆</a>
+    </div>
+</div>

@@ -1,0 +1,163 @@
+﻿@{
+    ViewBag.Title = "首页";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Barber.Models.User
+
+@section header
+{
+    <style type="text/css">
+        .main { padding: 20px; background-color: white; }
+        .main .input-group { margin: 10px 0; }
+    </style>
+
+    <script src="/angular.ng"></script>
+    <script src="/services.appconstant.ng"></script>
+    <script src="/services.tip.ng"></script>
+    <script src="/services.user.ng"></script>
+    <script src="/services.reserve.ng"></script>
+}
+
+<div class="container main" ng-app="UserApp">
+    <div class="row" ng-controller="FormCtrl">
+        <div top-tip></div>
+        <div class="col-md-6 col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    用户登陆
+                </div>
+                <div class="panel-body">
+                    <form novalidate name="LoginForm">
+                        <div class="input-group">
+                            <span class="input-group-addon">用户</span>
+                            <input type="text" value="" class="form-control" placeholder="你的用户名" ng-model="main.user.UserCode" required minlength="6" />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">密码</span>
+                            <input type="password" value="" class="form-control" placeholder="你的密码" ng-model="main.user.Password" required minlength="6" />
+                        </div>
+                        <div>
+                            <button class="btn btn-default" ng-click="main.login()" ng-disabled="LoginForm.$invalid">登陆</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    用户注册
+                    <a href="/Users/Barber" class="pull-right">理发师注册</a>
+                </div>
+                <div class="panel-body">
+                    <form novalidate name="RegisterForm">
+                        <div class="input-group">
+                            <span class="input-group-addon">姓名</span>
+                            <input type="text" value="" class="form-control" placeholder="你的姓名" ng-model="main.user.Name" required />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">用户</span>
+                            <input type="text" value="" class="form-control" placeholder="你的登陆用户名" ng-model="main.user.UserCode" minlength="6" required />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">性别: </span>
+                            <select class="form-control" ng-model="main.user.Gender">
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">密码</span>
+                            <input type="password" value="" class="form-control" placeholder="登陆密码" ng-model="main.user.Password" required minlength="6" />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">确认</span>
+                            <input type="password" value="" class="form-control" placeholder="确认登陆密码" ng-model="main.user.Repeat" required minlength="6" />
+                        </div>
+                        <hr />
+                        <div class="input-group">
+                            <span class="input-group-addon">地址: </span>
+                            <input type="text" value="" class="form-control" placeholder="你的地址" ng-model="main.user.Address" />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">年龄: </span>
+                            <input type="number" value="" class="form-control" placeholder="你的年龄" ng-model="main.user.Age" />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">简介: </span>
+                            <input type="text" value="" class="form-control" placeholder="一句话描述自己" ng-model="main.user.Signature" />
+                        </div>
+
+                        <div>
+                            <button class="btn btn-default" ng-disabled="RegisterForm.$invalid" ng-click="main.register()">提交</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-sm-12">
+            活跃用户
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts{
+    <script>
+        /// <reference path="~/Vendors/angular.min.js" />
+        /// <reference path="../../Vendors/amplify-vsdoc.js" />
+        /// <reference path="../Utils.js" />
+        /// <reference path="~/Vendors/jquery-2.1.3.min.js" />
+
+        var app = angular.module('UserApp', [
+            'services.appconstant',
+            'services.tip',
+            'services.user',
+            'services.reserve'
+        ]);
+        app.controller('FormCtrl', function ($scope, UserSvc, TipSvc) {
+            $scope.main = {
+                user: {
+                    UserCode: '',
+                    Password: '',
+                    Repeat: '',
+                    Name: '',
+                    Gender: 'male',
+                    Address: '',
+                    Age: '',
+                    Signature: '',
+                    UserType: 'User'
+                },
+                register: function () {
+                    UserSvc.register(this.user).then(function (rep) {
+                        if (rep.data && rep.data.Success) {
+                            TipSvc.toTip('注册成功, 正在登陆...');
+                            $scope.main.login();
+                        } else {
+                            TipSvc.toTip('注册失败: ' + rep.data.Brief);
+                        }
+                    });
+                },
+                login: function () {
+                    UserSvc.login(this.user.UserCode, this.user.Password).then(function (rep) {
+                        if (rep.data && rep.data.Success) {
+                            TipSvc.toTip('登陆成功, 正在跳转...');
+                            location.href = '/Users';
+                        } else {
+                            TipSvc.toTip('登陆失败!');
+                        }
+                    }, function () {
+                    });
+                }
+            };
+        });
+
+    </script>
+}

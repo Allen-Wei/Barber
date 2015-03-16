@@ -1,0 +1,151 @@
+﻿<style type="text/css">
+    .input-group { margin: 10px auto; }
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="input-group">
+            <span class="input-group-addon">切换</span>
+            <select ng-model="main.user.UserType" class="form-control">
+                <option value="Login">登陆</option>
+                <option value="User">普通用户注册</option>
+                <option value="Barber">理发师注册</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-12" ng-show="main.user.UserType == 'Login'">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                用户登陆
+            </div>
+            <div class="panel-body">
+                <form novalidate name="LoginForm">
+                    <div class="input-group">
+                        <span class="input-group-addon">用户</span>
+                        <input type="text" value="" class="form-control" placeholder="你的用户名" ng-model="main.user.UserCode" required minlength="6" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">密码</span>
+                        <input type="password" value="" class="form-control" placeholder="你的密码" ng-model="main.user.Password" required minlength="6" />
+                    </div>
+                    <div>
+                        <button class="btn btn-default" ng-click="main.login()" ng-disabled="LoginForm.$invalid">登陆</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12" ng-show="main.user.UserType == 'User'">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                用户注册
+            </div>
+            <div class="panel-body">
+                <form novalidate name="UserForm">
+                    <div class="input-group">
+                        <span class="input-group-addon">姓名</span>
+                        <input type="text" value="" class="form-control" placeholder="你的姓名" ng-model="main.user.Name" required />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">用户</span>
+                        <input type="text" value="" class="form-control" placeholder="你的登陆用户名" ng-model="main.user.UserCode" minlength="6" required />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">性别: </span>
+                        <select class="form-control" ng-model="main.user.Gender">
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">密码</span>
+                        <input type="password" value="" class="form-control" placeholder="登陆密码" ng-model="main.user.Password" required minlength="6" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">确认</span>
+                        <input type="password" value="" class="form-control" placeholder="确认登陆密码" ng-model="main.user.Repeat" required minlength="6" />
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">地址: </span>
+                        <input type="text" value="" class="form-control" placeholder="你的地址" ng-model="main.user.Address" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">年龄: </span>
+                        <input type="number" value="" class="form-control" placeholder="你的年龄" ng-model="main.user.Age" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">简介: </span>
+                        <input type="text" value="" class="form-control" placeholder="一句话描述自己" ng-model="main.user.Signature" />
+                    </div>
+
+                    <div>
+                        <button class="btn btn-default" ng-disabled="UserForm.$invalid" ng-click="main.register()">提交</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-sm-12" ng-show="main.user.UserType == 'Barber'">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                理发师注册
+            </div>
+            <div class="panel-body">
+                <form novalidate name="BarberForm">
+                    <div class="input-group">
+                        <span class="input-group-addon">姓名</span>
+                        <input type="text" value="" class="form-control" placeholder="你的姓名" ng-model="main.user.Name" required />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">店铺</span>
+                        <input type="text" value="" class="form-control" placeholder="你所工作的理发店名" ng-model="main.user.Barberer.ShopName" required />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">用户</span>
+                        <input type="text" value="" class="form-control" placeholder="你的登陆用户名" ng-model="main.user.UserCode" minlength="6" required />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">性别: </span>
+                        <select class="form-control" ng-model="main.user.Gender">
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">密码</span>
+                        <input type="password" value="" class="form-control" placeholder="登陆密码" ng-model="main.user.Password" required minlength="6" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">确认</span>
+                        <input type="password" value="" class="form-control" placeholder="确认登陆密码" ng-model="main.user.Repeat" required minlength="6" />
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">地址: </span>
+                        <input type="text" value="" class="form-control" placeholder="你的地址" ng-model="main.user.Address" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">年龄: </span>
+                        <input type="number" value="" class="form-control" placeholder="你的年龄" ng-model="main.user.Age" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">简介: </span>
+                        <input type="text" value="" class="form-control" placeholder="一句话描述自己" ng-model="main.user.Signature" />
+                    </div>
+
+                    <div>
+                        <button class="btn btn-default" ng-disabled="BarberForm.$invalid" ng-click="main.register()">提交</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-sm-12">
+
+    </div>
+</div>

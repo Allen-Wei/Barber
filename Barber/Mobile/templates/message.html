@@ -1,0 +1,30 @@
+﻿<style type="text/css">
+.messages-command{ margin-top: 10px;}
+    .messages-list .message { margin: 10px auto; }
+    .messages-list .message-content { }
+    .messages-list .message-date {margin-top: 5px; font-size: 12px; color: #aaa; text-align: right; }
+    .messages-list .messages-page{ margin: 10px auto;text-align: right;}
+</style>
+<div class="row messages-command">
+    <button class="btn btn-default col-xs-4" ng-class="{'btn-primary': main.mode == 'all'}" ng-click="main.mode = 'all'">全部消息</button>
+    <button class="btn btn-default col-xs-4" ng-class="{'btn-primary': main.mode == 'read'}" ng-click="main.mode= 'read'">已读消息</button>
+    <button class="btn btn-default col-xs-4" ng-class="{'btn-primary': main.mode == 'unread'}" ng-click="main.mode = 'unread'">未读消息<sup>{{Body.Message.UnreadCount}}</sup></button>
+</div>
+<div class="row">
+    <div class="col-xs-12 messages-list">
+        <div ng-repeat="message in main.messages" class="message">
+            <div class="message-content">
+                {{message.Content}}
+            </div>
+            <div class="message-date">
+                <button class="btn btn-info btn-xs" ng-click="main.setRead($index)" ng-show="!message.IsRead">设为已读</button>
+                {{message.GenerateDate | date: Body.Constant.ngDateFormat}}
+            </div>
+        </div>
+        <div class="messages-page">
+                <b>{{main.page}} / {{main.pages}}</b>
+            <button class="btn btn-xs btn-default" ng-click="main.page = main.page - 1" ng-disabled="main.page <= 1">上一页</button>
+            <button class="btn btn-xs btn-default" ng-click="main.page = main.page + 1" ng-disabled="main.page >= main.pages">下一页</button>
+        </div>
+    </div>
+</div>

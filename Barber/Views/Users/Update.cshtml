@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = "更新资料";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+    var Genders = new List<SelectListItem>()
+            {
+                new SelectListItem(){Selected = false, Text = "男", Value="male"},
+                new SelectListItem(){Selected = false, Text = "女", Value="female"}
+            };
+    foreach (var item in Genders)
+    {
+        if (Model.Gender == item.Value)
+        {
+            item.Selected = true;
+        }
+    }
+}
+
+@model Barber.Models.User
+
+@section header{
+
+    <style type="text/css">
+        form { background: white; padding: 10px; }
+        .input-group { margin: 10px auto; }
+
+        .user-avatar { float: left; position: relative; margin: 10px 0; height: auto; }
+        .user-avatar img {  width: 150px; height: 150px; }
+        .user-avatar div {  margin: 10px 0 0 0; }
+        @@media(max-width: 800px) {
+            .user-avatar { float: none; width: 100%;  }
+            .user-avatar img{display: inline-block; width: 50%; height:auto;}
+            .user-avatar div{display: inline-block; width: 45%;}
+        }
+    </style>
+}
+
+<div class="container main">
+    <div class="row">
+        <div>@ViewBag.Error</div>
+        <div class="col-sm-12">
+            @using (Html.BeginForm("Update", "Users", FormMethod.Post))
+            {
+
+                <div class="user-avatar">
+                    <img src="/@(Model.UserCode).avatar" alt="" />
+                    <div id="upload" data-url="/APIv1/File/UploadAvatar"></div>
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon">名字</span>
+                    @Html.TextBoxFor(u => u.Name, new { @class = "form-control" })
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">邮箱</span>
+                    @Html.TextBoxFor(u => u.Email, new { @class = "form-control", type = "email" })
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">年龄</span>
+                    @Html.TextBoxFor(u => u.Age, new { @class = "form-control", type = "number" })
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">性别</span>
+                    @Html.DropDownListFor(u => u.Gender, Genders, new { @class = "form-control" })
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">地址</span>
+                    @Html.TextBoxFor(u => u.Address, new { @class = "form-control" })
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">简介</span>
+                    @Html.TextBoxFor(u => u.Signature, new { @class = "form-control" })
+                </div>
+                if (Model.ThisIsBarber)
+                {
+                    <div class="input-group">
+                        <span class="input-group-addon">店名</span>
+                        @Html.TextBoxFor(u => u.Barberer.ShopName, new { @class = "form-control" })
+                    </div>
+                }
+
+                <input type="submit" value="提交" class="btn btn-default" />
+
+            }
+        </div>
+    </div>
+</div>
+@section scripts{
+<script src="~/Scripts/aUtils.File.js"></script>
+    <script>
+        ///<reference path="/Scripts/Utils.js"/>
+        aUtils.File.initial($('#upload'), {
+            getImageUrl: function (data) {
+                if (!data.Success) { return; }
+                var imgUrl = data.Result.replace('\\', '/').replace('~', '');
+                $('.user-avatar').find('img').fadeOut(function () {
+                })
+                $('#upload').siblings('img').fadeOut(function () {
+                    var $newImg = $('<img />').attr('src', imgUrl).hide();
+                    $(this).replaceWith($newImg);
+                    $newImg.fadeIn();
+                })
+                return undefined;
+            }
+        });
+    </script>
+}

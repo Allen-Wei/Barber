@@ -1,0 +1,315 @@
+﻿@{
+    ViewBag.Title = "个人主页";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Barber.Models.User
+@{
+    var isLogin = (bool)ViewBag.IsLogin;
+    var isCurrent = (bool)ViewBag.IsCurrent;
+}
+
+@section header
+{
+    <style type="text/css">
+        .profile { background-color: white; }
+        .profile .profile-picture { margin-top: 10px; float: left; margin-right: 10px; width: 120px; height: 120px; background-color: #0094ff; }
+        .profile .profile-picture img { width: 100%; height: 100%; }
+        .profile .profile-detail { padding: 10px; }
+
+        .profile .profile-detail div { margin-top: 10px; }
+        .profile .profile-social { margin-top: 0; }
+        .profile .profile-social .barber-shop { float: right; }
+        .profile .profile-social b { font-size: 18px; font-weight: lighter; }
+        .profile .profile-social .fa { font-size: 1em; }
+        .profile .profile-gender { }
+        .profile .profile-tags { }
+        .profile .profile-score .fa { font-size: 1.5em; }
+        .profile .profile-score a { float: right; }
+
+        .profile .profile-signature { padding: 10px; text-indent: 1em; font-size: 15px; border-top: 1px solid #eee; }
+
+        .main-block { margin: 10px 0; background-color: white; }
+        .main-block .main-block-title { margin: 0; padding: 10px 0; text-indent: 10px; border-bottom: 1px solid #eee; font-weight: lighter; font-size: 16px; }
+        .main-block .main-block-title .fa { float: right; margin-right: 10px; cursor: pointer; }
+        .main-block .main-block-area { padding: 10px; }
+
+        .schedule { }
+        .schedule .table-bordered > thead > tr > th { border-bottom-width: 1px; text-align: center; }
+        .schedule table tbody tr td { background-color: #eee; }
+        .schedule table tbody tr td sup { display: none; color: #aaaaaa; }
+        .schedule table tbody tr td.day-has-value { background-color: white; }
+        .schedule table tbody tr td.day-has-value sup { display: inline-block; }
+        .schedule table tbody tr td.day-selected { background-color: #0094ff; color: white; }
+        .schedule .schedule-note { font-size: 12px; }
+        .schedule .schedule-submit { }
+        .schedule .schedule-submit hr { margin: 10px auto; }
+
+        .skills { }
+        .skills .bar-list { margin-bottom: 10px; }
+        .skills .bar-list li { padding: 5px 10px; border: 1px solid #ddd; border-bottom: none; font-size: 14px; }
+        .skills .bar-list li:last-child { border-bottom: 1px solid #ddd; }
+        .skills .bar-list li span { float: right; }
+        .skills .bar-list li i.fa-remove { margin-left: 5px; cursor: pointer; }
+        .skills .bar-list li i.fa-remove:hover { color: red; }
+
+        .tweets { }
+        .tweets ul { }
+        .tweets ul li { position: relative; margin: 10px 0; padding: 8px 10px; border: 1px solid #ddd; cursor: pointer; font-size: 15px; }
+        .tweets ul li:hover { background-color: rgb(250, 250, 250); }
+        .tweets ul li span.pull-right { position: absolute; top: 10px; right: 0; margin-right: 8px; font-size: 1em; }
+        .tweets ul li .fa-remove:hover { color: red; }
+        .tweets ul li ul { margin-top: 10px; border-top: 1px solid #ededed; }
+        .tweets ul li ul li { margin: 5px 0 0 auto; padding: 3px 5px; width: 60%; border: none; font-size: 13px; text-align: right; }
+        .tweets ul li ul li .fa { float: none; visibility: hidden; }
+        .tweets .btn { width: 100%; }
+        .tweets .input-group { margin-top: 5px; }
+
+
+        .main-right { }
+        .side-login { padding: 10px; background-color: white; }
+        .side-login .input-group { margin-bottom: 10px; }
+        .side-login div:last-child { margin-top: 8px; }
+
+
+        .is-login { visibility: hidden; }
+        .is-current { visibility: hidden; }
+    </style>
+    @if (isLogin)
+    {
+        <style type="text/css">
+            .is-login { visibility: visible; }
+        </style>
+    }
+    @if (isCurrent)
+    {
+        <style type="text/css">
+            .is-current { visibility: visible; }
+        </style>
+    }
+    <script src="/angular.ng"></script>
+    <script src="/directives.barCalendar.ng"></script>
+    <script src="/services.ng"></script>
+
+    <script>
+        var Global = {
+            userCode: "@ViewBag.UserCode",
+            isLogin:@(isLogin ? "true":"false")
+            };
+    </script>
+}
+
+
+<div class="container main" ng-app="UserApp">
+    <div class="row" ng-controller="BodyCtrl">
+
+
+        <div class="col-md-8 col-sm-12 main-left">
+            <div class="profile">
+                <div class="profile-picture">
+                    <img src="/@(Model.UserCode).avatar" alt="@Model.Name" title="@Model.Name" />
+                </div>
+                <div class="profile-detail">
+                    <h3 class="profile-social">
+                        <b>@(Model.Name ?? "未填写")</b>
+                        <i class="fa fa-heart-o"></i>
+                        <i class="fa fa-twitter"></i>
+                        <a href="/Users/Update" class="is-current">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <i class="fa fa-shopping-cart barber-shop">
+                            <b>@Model.Barberer.ShopName</b>
+                        </i>
+                    </h3>
+                    <h5 class="profile-gender">@(Model.Gender == "female" ? "女" : "男")</h5>
+                    <div class="profile-address">
+                        <i class="fa fa-location-arrow"></i>
+                        @(Model.Address ?? "未知")
+                    </div>
+                    <div class="profile-tags fa fa-tag">
+                        @foreach (Tag t in Model.Tags)
+                        {
+                            <a href="#" title="添加日期: @t.TagDate" data-tag-id="@t.Id">@t.TagName</a>
+                        }
+                        @if (Model.Tags.Count() <= 0)
+                        {
+                            <span>暂无</span>
+                        }
+                    </div>
+                    <div class="profile-score">
+                        <span>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-o"></i>
+                        </span>
+                        <a href="#/">查看详情</a>
+                    </div>
+                </div>
+                <p class="profile-signature">
+                    @if (String.IsNullOrWhiteSpace(Model.Signature))
+                    {
+                        <i>暂无</i>
+                    }
+                    else
+                    {
+                        <span>@Model.Signature</span>
+                    }
+                </p>
+            </div>@if (Model.ThisIsBarber)
+            {
+
+                <div class="main-block skills" ng-controller="SkillCtrl">
+                    <h3 class="main-block-title">技能</h3>
+                    <div class="main-block-area">
+                        <ul class="bar-list">
+                            @foreach (var skill in Model.Skills)
+                            {
+                                <li data-skill-id="@skill.Id">
+                                    @skill.SkillName
+                                    <span>
+                                        <i class="date-small">@String.Format("{0:yyyy-MM-dd}", skill.SkillDate ?? DateTime.Now)</i>
+                                        <i class="fa fa-remove is-login is-current"></i>
+                                    </span>
+                                </li>
+                            }
+                            <li ng-repeat="skill in main.skills" data-skill-id="{{skill.Id}}">
+                                {{skill.SkillName}}
+                                <span>
+                                    <i class="date-small">{{skill.SkillDate | date: constant.ngDateFormat}}</i>
+                                    <i class="fa fa-remove is-login is-current"></i>
+                                </span>
+                            </li>
+                        </ul>
+
+                        <div class="input-group is-login is-current">
+                            <input type="text" value="" class="form-control" ng-model="main.skill" placeholder="点亮新技能" />
+                            <span class="input-group-btn" ng-click="main.submit()">
+                                <button class="btn btn-default">提交</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-block schedule" ng-controller="ReserveCtrl">
+                    <h3 class="main-block-title">时间安排</h3>
+
+                    <div class="main-block-area">
+                        <bar-calendar ajax-add="main.ajax.add"
+                                      ajax-load-list="main.ajax.load"
+                                      ajax-count-per-day="main.ajax.countPerDay"
+                                      calendar-user-code="main.userCode"
+                                      calendar-show-submit="main.showSubmit"></bar-calendar>
+
+                    </div>
+                </div>
+            }
+
+            <div class="main-block tweets" ng-controller="TweetCtrl">
+                <h3 class="main-block-title">
+                    动态
+                    <i class="fa fa-refresh" ng-click="main.list.refresh()"></i>
+                </h3>
+                <div class="main-block-area">
+                    <ul>
+                        <!-- Tweets -->
+                        <li class="animate-background" ng-repeat="tweet in main.list.entities">
+                            <div style="padding-right: 30px;">
+                                {{tweet.Content}}
+                                <i class="date-small">{{tweet.PublishDate | date: constant.ngDateFormatDetail}}</i>
+                            </div>
+                            <span class="pull-right">
+                                <span class="fa" ng-click="main.list.expandToggle($index)" ng-class="{'fa-arrow-up': tweet.expand, 'fa-arrow-down': !tweet.expand}"></span>
+                                <span class="fa fa-remove animate-color is-login is-current" ng-click="main.list.remove($index)"></span>
+                            </span>
+                            <!-- Comments -->
+                            <ul ng-show="tweet.expand">
+                                <li ng-repeat="comment in tweet.Comments">
+                                    <span class="fa fa-remove animate-color is-login" ng-click="main.comment.remove(tweet, $index)"></span>
+                                    {{comment.Content}}
+                                    <i class="date-small">{{comment.PublishDate | date: constant.ngDateFormatDetail}}</i>
+                                </li>
+                                <li class="input-group is-login">
+                                    <input type="text" value="" ng-model="main.add.commentContent" class="form-control" placeholder="书写评论" />
+                                    <span class="input-group-addon" ng-click="main.add.comment($index)">提交</span>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <button class="btn btn-default btn-sm ng-hide" ng-click="main.list.loadMore()" ng-hide="main.list.page >= main.list.pages">加载更多</button>
+                    <button class="btn btn-default btn-sm ng-hide" ng-click="main.list.refresh()" ng-show="main.list.page >= main.list.pages">收起</button>
+                    <div class="input-group is-login is-current">
+                        <input type="text" value="" ng-model="main.add.tweetContent" class="form-control" placeholder="发布动态" />
+                        <span class="input-group-btn" ng-click="main.add.tweet($index)">
+                            <button class="btn btn-default">提交</button>
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="main-block fans">
+                <h3 class="main-block-title">粉丝</h3>
+                <div class="main-block-area">Hello, world.</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12 main-right">
+            <div class="side-login" ng-controller="LoginCtrl">
+                <form novalidate name="loginform">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="glyphicon glyphicon-user"></i>
+                        </span>
+                        <input type="text" class="form-control" placeholder="用户名" required ng-model="main.user.UserCode" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class=" glyphicon glyphicon-lock"></i>
+                        </span>
+                        <input type="password" class="form-control" placeholder="密码" required ng-model="main.user.Password" />
+                    </div>
+                    <div class="text-right">
+                        <a href="/Users/Barber">注册为理发师</a>
+                    </div>
+                    <div class="text-right">
+                        <button class="btn btn-default" ng-disabled="loginform.$invalid" ng-click="main.login()">登陆</button>
+                        <button class="btn btn-info" ng-disabled="loginform.$invalid" ng-click="main.register()">注册</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        /// <reference path="~/Vendors/jquery-2.1.3.min.js" />
+        $(document).ready(function () {
+            $('body .tweets').on('mouseover', 'ul li ul li', function () {
+                var $remove = $(this).find('.fa-remove');
+                $remove.css('visibility', 'visible');
+            }).on('mouseout', 'ul li ul li', function () {
+                var $remove = $(this).find('.fa-remove');
+                $remove.css('visibility', 'hidden');
+            });
+
+            $('body .skills').on('click', '.fa-remove', function () {
+                var $li = $(this).closest('li');
+                var skillId = $li.data('skillId');
+                $.eAjax('/Api/Skill/' + skillId, 'delete').then(function (rep) {
+                    if (rep) {
+                        $li.slideUp(function () {
+                            $li.remove();
+                        });
+                    }
+                });
+            });
+
+        });
+    </script>
+
+    <script src="/boot.users.detail.ng"></script>
+
+}
+

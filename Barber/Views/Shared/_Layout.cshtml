@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--_Layout.cshtml -> head-->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title - 丝路</title>
+    <link href="~/Styles/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Styles/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Styles/main.css" rel="stylesheet" />
+
+    <script src="~/Vendors/jquery-2.1.3.min.js" type="text/javascript"></script>
+    <script src="~/Vendors/amplify.min.js"></script>
+    <script src="~/Scripts/Utils.js"></script>
+    <script src="~/Scripts/Calendar.js"></script>
+
+    <style type="text/css">
+        .fa { cursor: pointer; }
+
+        .date-small { font-size: 12px; color: #999; white-space: nowrap; }
+    </style>
+
+
+    <!--_Layout.cshtml section header-->
+    @RenderSection("header", false)
+</head>
+<body>
+    <div>
+        <div class="header">
+            <div class="container">
+                <div class="head-logo" title="Logo">
+                    <a href="/" style="color:white;">丝路</a>
+                </div>
+                <div class="head-nav">
+                    @if (Barber.Models.User.IsLogin)
+                    {
+                        <a class="head-btn" href="/Users">主页</a>
+                        <a class="head-btn" href="/Users/Message?filter=unread">
+                            消息
+                            <sup class="message-unread-count">@Message.UnReadCount()</sup>
+                        </a>
+                        <a class="head-btn" href="/Users/SignOut">退出</a>
+                    }
+                    else
+                    {
+                        <a class="head-btn" href="/">登陆</a>
+                        <a class="head-btn" href="/">注册</a>
+                    }
+                    <input type="text" value="" placeholder="搜索" />
+                    <span class="fa fa-search fa-rotate-90 head-search"></span>
+                </div>
+                <div class="head-nav-toggle">
+                    <span class="fa fa-toggle-on"></span> 
+                </div>
+            </div>
+        </div>
+
+        <div class="body">
+            @RenderBody()
+        </div>
+
+        <div class="footer">
+            <div class="copyright text-center">
+                <span class="fa fa-copyright"></span> 2015 allen-wei@live.com
+            </div>
+        </div>
+
+    </div>
+
+    @RenderSection("scripts", required: false)
+    <script>
+        /*
+            publish/subscribe service
+        */
+        amplify.subscribe('user.message.unread.refresh', function () {
+            $.getJSON('/Api/Message').then(function (rep) {
+                $('.message-unread-count').text(rep);
+            });
+        })
+
+        $('.head-nav-toggle').on('click', function() {
+            $('.head-nav').slideToggle();
+        });
+    </script>
+</body>
+
+</html>

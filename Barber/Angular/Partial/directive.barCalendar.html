@@ -1,0 +1,74 @@
+﻿<div>
+
+    <table class="table table-bordered table-responsive">
+        <caption>{{main._calendar.Year()}}年</caption>
+        <thead>
+            <tr>
+                <th colspan="7">
+                    <span class="pull-left">
+                        <span class="fa fa-arrow-left pull-left" ng-click="main.previousMonth()"></span>
+                        <b>{{main._calendar.previousMonth()}}月</b>
+                    </span>
+                    <b>{{main._calendar.Month()}}月</b>
+                    <span class="pull-right">
+                        <b>{{main._calendar.nextMonth()}}月</b>
+                        <span class="fa fa-arrow-right" ng-click="main.nextMonth()"></span>
+                    </span>
+                </th>
+            </tr>
+            <tr>
+                <th>日</th>
+                <th>一</th>
+                <th>二</th>
+                <th>三</th>
+                <th>四</th>
+                <th>五</th>
+                <th>六</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="week in main.days">
+                <td ng-repeat="day in week" ng-click="main.selectDay(day, $index)" ng-class="{'day-has-value':day.day, 'day-selected':day.selected}">
+                    {{day.day}}
+                    <sup>{{day.count}}</sup>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7">
+                    <div class="schedule-note">
+                        <span>
+                            当前日期:
+                        </span>
+                        <i ng-hide="main.selectedDay.day">暂无</i>
+                        <i ng-show="main.selectedDay.day">{{main.selectedDay.year}}-{{main.selectedDay.month}}-{{main.selectedDay.day}}</i>
+
+                        <button class="btn btn-default btn-xs pull-right" ng-click="main.goToday()">今天</button>
+                    </div>
+                    <div class="schedule-submit" ng-show="main.selectedDay.day">
+                        <hr />
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="reserve in main.reserves">
+                                <span>
+                                    {{reserve.Description}}
+                                </span>
+                                <i class="pull-right">
+                                    - <a href="#/user/{{reserve.User.UserCode}}">{{reserve.User.Name || reserve.User.UserCode}} </a>
+                                </i>
+                            </li>
+                        </ul>
+                        <div class="input-group" style="width: 100%;" ng-show="calendarShowSubmit">
+                            <span class="input-group-addon">预约备注</span>
+                            <input type="text" value="" class="form-control" ng-model="main.content" placeholder="内容" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" ng-click="main.submit()">提交</button>
+                            </span>
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

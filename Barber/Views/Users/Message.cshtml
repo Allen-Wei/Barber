@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "消息中心";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model IEnumerable<Message>
+
+<style type="text/css">
+    .messages > div { padding: 10px; background: white; }
+    .messages .messages-filter { }
+    .messages .messages-command { padding-bottom: 0; }
+    .messages .messages-command .btn { border-bottom: none; }
+    .messages .messages-list { padding-top: 0; }
+    .messages .messages-list li { overflow: hidden; }
+    .messages .messages-list li.message-read { color: #999; }
+    .messages .messages-list li div { position: relative; float: right; }
+    .messages .messages-list li div .btn { position: absolute; right: -100px; top: -7px; border: none; }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 messages">
+            <div class="messages-filter">
+                <a class="btn btn-info" href="/Users/Message?filter=all">全部消息</a>
+                <a class="btn btn-default" href="/Users/Message?filter=read">已读消息</a>
+                <a class="btn btn-success" href="/Users/Message?filter=unread">
+                    未读消息
+                    <sup class="message-unread-count">@Message.UnReadCount()</sup>
+                </a>
+
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="messages-command">
+                    @if (ViewBag.Filter != "read")
+                    {
+                        <button id="message-setallread" class="btn btn-danger btn-sm">全部设为已读</button>
+                    }
+                </div>
+                <div class="messages-list">
+                    <ul class="list-group">
+                        @foreach (var msg in Model)
+                        {
+                            <li class="list-group-item" data-isread="@msg.IsRead.ToString().ToLower()">
+                                <b class="fa"></b>
+                                <span>
+                                    @msg.Content
+                                </span>
+                                <div>
+                                    <i class="date-small">@msg.GenerateDate</i>
+                                    @if (!msg.IsRead)
+                                    {
+                                        <button class="btn btn-danger message-setread"
+                                                data-message-id="@msg.Id">
+                                            设为已读
+                                        </button>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <h5>没有未读消息</h5>
+            }
+            <div class="">
+                共 @ViewBag.Pages 页 &nbsp; &nbsp;
+                @for (var page = 1; page <= (int)ViewBag.Pages; page++)
+                {
+                    <a href="?filter=@ViewBag.Filter&page=@page" title="第@page页">@page</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('.messages-list ul li').each(function () {
+        var isRead = $(this).data('isread');
+        if (isRead) {
+            $(this).addClass('message-read');;
+        } else {
+            $(this).addClass('message-unread');
+        }
+    }).on('click', '.message-setread', function () {
+        var $btn = $(this);
+        var messageId = $btn.data('messageId');
+        $.eAjax('/Api/Message/' + messageId, 'POST').then(function (rep) {
+            if (rep) {
+                $btn.hide().closest('li').addClass('message-read').end().remove();
+                amplify.publish('user.message.unread.refresh');
+            }
+        });
+    }).hover(function () {
+        var $btn = $(this).find('.btn');
+        $btn.stop(true, true).animate({ right: '-15px' });
+    }, function () {
+        var $btn = $(this).find('.btn');
+        $btn.stop(true, true).animate({ right: '-100px' });
+    });
+    $('#message-setallread').on('click', function () {
+        var messageIds = [];
+        $('.message-setread').each(function() {
+            messageIds.push($(this).data('messageId'));
+        });
+        $.eAjax('/Api/Message', 'POST', messageIds).then(function () {
+            $('.message-setread').each(function () {
+                $(this).hide().closest('li').addClass('message-read').end().remove();
+            });
+            amplify.publish('user.message.unread.refresh');
+        });
+    });
+</script>

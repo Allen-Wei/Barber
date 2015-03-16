@@ -1,0 +1,22 @@
+﻿<div id="reg-breadcrumb" class="row">
+    <ol class="breadcrumb"></ol>
+</div>
+
+<script>
+    amplify.subscribe('path.refresh', function (paths) {
+        if (paths === undefined || paths.length === undefined) { return; }
+        var $list = $('#reg-breadcrumb ol');
+        $list.empty();
+        for (var i = 0; i < paths.length; i++) {
+            var path = paths[i];
+            var $li = $('<li />');
+            if (path.href) {
+                $li.append($('<a />').text(path.text).attr({ 'href': path.href }));
+            } else {
+                $li.text(path.text).addClass('active');
+            }
+
+            $list.append($li);
+        }
+    });
+</script>

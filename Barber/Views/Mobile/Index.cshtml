@@ -1,0 +1,52 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>丝路 - 手机版</title>
+    <link href="~/Styles/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Styles/font-awesome.min.css" rel="stylesheet" />
+
+    <script src="~/Vendors/jquery-2.1.3.min.js" type="text/javascript"></script>
+    <script src="~/Vendors/amplify.min.js"></script>
+    <script src="~/Scripts/Utils.js"></script>
+    <script src="~/Scripts/Calendar.js"></script>
+
+    <script src="/angular.ng"></script>
+    <script src="/directives.barCalendar.ng"></script>
+    <script src="/services.ng"></script>
+
+    <script src="~/Mobile/scripts/app.js"></script>
+    <script src="~/Mobile/scripts/routes.js"></script>
+
+    <style type="text/css">
+        * { margin: 0; padding: 0; }
+        ul, ol { list-style-type: none; }
+        body { font-size: 14px; font-family: 'Microsoft YaHei', '微软雅黑', sans-serif; }
+        .fa { cursor: pointer; }
+        .breadcrumb { margin: 0; }
+        .tip { font-size: 1em; }
+        .date-small { font-size: 12px; color: #999; white-space: nowrap; }
+    </style>
+</head>
+<body ng-app="MobileApp">
+
+    <div ng-controller="BodyCtrl">
+        <ul class="breadcrumb">
+            <li ng-repeat="bread in Body.Mobile.breadcrumb">
+                <a ng-href="{{bread.href}}" ng-show="!$last">{{bread.text}}</a>
+                <span ng-show="$last" class="active">{{bread.text}}</span>
+            </li>
+        </ul>
+
+        <div class="container-fluid">
+            <div top-tip></div>
+            <div ng-view></div>
+        </div>
+    </div>
+</body>
+</html>

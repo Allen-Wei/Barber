@@ -1,0 +1,153 @@
+﻿.animate-color {
+  transition: color 0.3s ease-in 0.3s;
+}
+.animate-color:hover {
+  transition: color 0.3s ease-out 0.3s;
+}
+.animate-background {
+  transition: background 0.3s ease-in 0.3s;
+}
+.animate-background:hover {
+  transition: background 0.3s ease-out 0.3s;
+}
+a,
+p,
+div,
+ul,
+ol,
+li,
+i,
+b,
+span,
+button,
+input {
+  margin: 0;
+  padding: 0;
+  font-family: 'Microsoft YaHei', sans-serif;
+}
+body {
+  background-color: #efefef;
+}
+ul,
+ol {
+  list-style-type: none;
+}
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 50px;
+  font-size: 16px;
+  background-color: #000000;
+  color: #ffffff;
+  z-index: 99;
+}
+.header .container {
+  position: relative;
+}
+.header .container .head-logo {
+  float: left;
+  width: 120px;
+  height: 50px;
+  line-height: 50px;
+  background-color: #0094ff;
+  text-align: center;
+  transition: background 0.3s ease-in 0.3s;
+}
+.header .container .head-logo:hover {
+  transition: background 0.3s ease-out 0.3s;
+}
+.header .container .head-logo:hover {
+  background-color: #0076cc;
+}
+.header .container .head-nav {
+  float: right;
+}
+.header .container .head-nav .head-btn {
+  display: inline-block;
+  padding: 0 10px;
+  color: #cccccc;
+  height: 50px;
+  line-height: 50px;
+  transition: color 0.3s ease-in 0.3s;
+}
+.header .container .head-nav .head-btn:hover {
+  transition: color 0.3s ease-out 0.3s;
+}
+.header .container .head-nav .head-btn:hover {
+  color: #f5f5f5;
+  text-decoration: none;
+}
+.header .container .head-nav input {
+  font-size: 13px;
+  padding: 3px 5px;
+  border: none;
+  color: #000000;
+}
+.header .container .head-nav .head-search {
+  position: absolute;
+  top: 19px;
+  right: 5px;
+  cursor: pointer;
+  color: black;
+}
+.header .container .head-nav-toggle {
+  display: none;
+}
+div.body {
+  margin-top: 70px;
+}
+/*Responsive Class*/
+.container {
+  padding: 0;
+}
+@media (max-width: 500px) {
+  /*0 -> sm-width*/
+  .header .container .head-nav {
+    display: none;
+    width: 100%;
+    background: #808080;
+    text-align: center;
+    opacity: 0.9;
+    transition: background 0.3s ease-in 0.3s;
+  }
+  .header .container .head-nav:hover {
+    transition: background 0.3s ease-out 0.3s;
+  }
+  .header .container .head-nav .head-btn {
+    display: block;
+  }
+  .header .container .head-nav .head-btn:hover {
+    background: #666666;
+  }
+  .header .container .head-nav input {
+    display: none;
+  }
+  .header .container .head-nav .head-search {
+    display: none;
+  }
+  .header .container .head-nav-toggle {
+    margin: 15px;
+    display: block;
+    text-align: right;
+  }
+}
+@media (min-width: 768px) {
+  /*sm-width -> max*/
+  .container {
+    width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  /*md-width -> max*/
+  .container {
+    width: 100%;
+  }
+}
+@media (min-width: 1200px) {
+  /*lg-width -> max*/
+  .container {
+    width: 1000px;
+  }
+}
+/*# sourceMappingURL=main.css.map */

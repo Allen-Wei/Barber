@@ -1,0 +1,177 @@
+﻿<style type="text/css">
+    .col-xs-12 { padding: 0; }
+    .profile { background-color: white; }
+
+    .profile .profile-detail { padding: 10px; }
+    .profile .profile-detail h3 { }
+    .profile .profile-detail div { }
+    .profile .profile-detail p { text-indent: 1em; font-size: 15px; }
+    .profile .profile-detail .profile-tags { }
+    .profile .profile-detail .profile-tags > span { display: inline-block; padding: 8px 5px; }
+    .profile .profile-detail .profile-tags .input-group { margin-left: 1em; width: 100px; }
+    .profile .profile-detail .profile-tags input { padding: 0; height: 22px; line-height: 22px; font-size: 12px; }
+
+    .main-block { margin-bottom: 20px; border-bottom: 1px solid #aaa; }
+    .main-block .main-block-title { margin: 0; padding: 10px 0; text-indent: 10px; border-bottom: 1px solid #eee; font-weight: lighter; font-size: 16px; }
+    .main-block .main-block-title .fa { float: right; margin-right: 10px; cursor: pointer; }
+    .main-block .main-block-area { padding: 10px; }
+
+    .schedule { }
+    .schedule .table-bordered > thead > tr > th { border-bottom-width: 1px; text-align: center; }
+    .schedule table tbody tr td { background-color: #eee; }
+    .schedule table tbody tr td sup { display: none; }
+    .schedule table tbody tr td.day-has-value { background-color: white; }
+    .schedule table tbody tr td.day-has-value sup { color: #aaaaaa; display: inline-block; }
+    .schedule table tbody tr td.day-selected { background-color: #0094ff; color: white; }
+    .schedule .schedule-note { font-size: 12px; }
+    .schedule .schedule-submit { }
+    .schedule .schedule-submit hr { margin: 10px auto; }
+
+    .skills { }
+    .skills .bar-list { margin-bottom: 10px; }
+    .skills .bar-list li { padding: 5px 10px; border: 1px solid #ddd; border-bottom: none; font-size: 14px; }
+    .skills .bar-list li:last-child { border-bottom: 1px solid #ddd; }
+    .skills .bar-list li span { float: right; }
+    .skills .bar-list li i.fa-remove { margin-left: 5px; cursor: pointer; }
+    .skills .bar-list li i.fa-remove:hover { color: red; }
+
+    .tweets { }
+    .tweets ul { }
+    .tweets ul li { position: relative; margin: 10px 0; padding: 8px 10px; border: 1px solid #ddd; cursor: pointer; font-size: 15px; }
+    .tweets ul li:hover { background-color: rgb(250, 250, 250); }
+    .tweets ul li span.pull-right { position: absolute; top: 10px; right: 0; margin-right: 8px; font-size: 1em; }
+    .tweets ul li .fa-remove:hover { color: red; }
+    .tweets ul li ul { margin-top: 10px; border-top: 1px solid #ededed; }
+    .tweets ul li ul li { margin: 5px 0 0 auto; padding: 3px 5px; width: 60%; border: none; font-size: 13px; text-align: right; }
+    .tweets ul li ul li .fa { float: none; }
+    .tweets .btn { width: 100%; }
+    .tweets .input-group { margin-top: 5px; }
+
+
+    .main-right { }
+    .side-login { padding: 10px; background-color: white; }
+    .side-login .input-group { margin-bottom: 10px; }
+    .side-login div:last-child { margin-top: 8px; }
+</style>
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="profile">
+                <div class="profile-detail">
+                    <h3>
+                        <b>{{Body.User.user.Name}}</b> /
+                        <span>{{Body.User.user.Gender == "female" ? "女" : "男"}}</span>
+                        <a href="#/profile/update">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                    </h3>
+                    <div ng-show="Body.User.user.ThisIsBarber">
+                        <i class="fa fa-shopping-cart"></i>
+                        {{Body.User.user.Barberer.ShopName}}
+                    </div>
+                    <div>
+                        <i class="fa fa-location-arrow"></i>
+                        {{Body.User.user.Address}}
+                    </div>
+                    <div ng-controller="TagCtrl" class="profile-tags">
+                        <i class="profile-tags fa fa-tag"></i>
+                        <span ng-repeat="tag in main.tags">
+                            {{tag.TagName}}
+                            <i class="fa fa-remove" ng-click="main.remove($index)"></i>
+                        </span>
+                        <div class="input-group">
+                            <input type="text" value="" ng-model="main.tag.TagName" class="form-control" placeholder="新标签" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default  btn-xs" ng-click="main.submit()">添加</button>
+                            </span>
+                        </div>
+                    </div>
+                    <p> {{Body.User.user.Signature}} </p>
+                </div>
+            </div>
+
+            <div class="main-block skills" ng-show="Body.User.user.ThisIsBarber" ng-controller="SkillCtrl">
+                <h3 class="main-block-title">技能</h3>
+                <div class="main-block-area">
+                    <ul class="bar-list">
+
+                        <li ng-repeat="skill in main.skills">
+                            {{skill.SkillName}}
+                            <span>
+                                <i class="date-small">{{skill.SkillDate | date: constant.ngDateFormat}}</i>
+                                <i class="fa fa-remove"></i>
+                            </span>
+                        </li>
+                    </ul>
+
+                    <div class="input-group">
+                        <input type="text" value="" class="form-control" ng-model="main.skill" placeholder="点亮新技能" />
+                        <span class="input-group-btn" ng-click="main.submit()">
+                            <button class="btn btn-default">提交</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-block schedule" ng-show="Body.User.user.ThisIsBarber" ng-controller="ReserveCtrl">
+                <h3 class="main-block-title">时间安排</h3>
+                <div class="main-block-area">
+
+                    <bar-calendar ajax-add="main.ajax.add"
+                                  ajax-load-list="main.ajax.load"
+                                  ajax-count-per-day="main.ajax.countPerDay"
+                                  calendar-user-code="main.userCode"
+                                  calendar-show-submit="main.showSubmit"></bar-calendar>
+
+                </div>
+            </div>
+
+            <div class="main-block tweets" ng-controller="TweetCtrl">
+                <h3 class="main-block-title">
+                    动态
+                    <i class="fa fa-refresh" ng-click="main.list.refresh()"></i>
+                </h3>
+                <div class="main-block-area">
+                    <ul>
+                        <!-- Tweets -->
+                        <li class="animate-background" ng-repeat="tweet in main.list.entities">
+                            <div style="padding-right: 30px;">
+                                {{tweet.Content}}
+                                <i class="date-small">{{tweet.PublishDate | date: constant.ngDateFormatDetail}}</i>
+                            </div>
+                            <span class="pull-right">
+                                <span class="fa" ng-click="main.list.expandToggle($index)" ng-class="{'fa-arrow-up': tweet.expand, 'fa-arrow-down': !tweet.expand}"></span>
+                                <span class="fa fa-remove animate-color" ng-click="main.list.remove($index)"></span>
+                            </span>
+                            <!-- Comments -->
+                            <ul ng-show="tweet.expand">
+                                <li ng-repeat="comment in tweet.Comments">
+                                    <span class="fa fa-remove animate-color" ng-click="main.comment.remove(tweet, $index)"></span>
+                                    {{comment.Content}}
+                                    <i class="date-small">{{comment.PublishDate | date: constant.ngDateFormatDetail}}</i>
+                                </li>
+                                <li class="input-group">
+                                    <input type="text" value="" ng-model="main.add.commentContent" class="form-control" placeholder="书写评论" />
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" ng-click="main.add.comment($index)">提交</button>
+                                    </span>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <button class="btn btn-default btn-sm ng-hide" ng-click="main.list.loadMore()" ng-hide="main.list.page >= main.list.pages">加载更多</button>
+                    <button class="btn btn-default btn-sm ng-hide" ng-click="main.list.refresh()" ng-show="main.list.page >= main.list.pages">收起</button>
+                    <div class="input-group">
+                        <input type="text" value="" ng-model="main.add.tweetContent" class="form-control" placeholder="发布动态" />
+                        <span class="input-group-btn" ng-click="main.add.tweet($index)">
+                            <button class="btn btn-default">提交</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

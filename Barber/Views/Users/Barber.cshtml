@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title = "理发师";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section header{
+    <style type="text/css">
+        .user-info { padding-bottom: 20px; margin-top: 20px; }
+        .user-info > div { padding: 5px 10px; background-color: white; }
+        .user-info h3 { margin: 20px auto; }
+        .user-info hr { border-top-color: #dedede; margin: 15px auto; }
+        .user-info .input-group { margin: 8px auto; }
+        .ng-invalid.ng-dirty { border-color: red; }
+    </style>
+
+    <script src="/angular.ng"></script>
+    <script src="/services.ng"></script>
+
+}
+
+<div class="container main" ng-app="BarberApp">
+    <div class="row" ng-controller="BodyCtrl">
+        <div class="col-sm-12 user-info" ng-controller="RegisterCtrl">
+            <div>
+
+                <h3 class="text-info">
+                    注册理发师
+                </h3>
+                <form novalidate name="BarberForm">
+                    <div class="input-group">
+                        <span class="input-group-addon">理发店: </span>
+                        <input type="text" value="" class="form-control" placeholder="你工作的理发店名字(必填项)" ng-model="main.user.Barberer.ShopName" required />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">用户名: </span>
+                        <input type="text" value="" class="form-control" placeholder="用户名(必填项)" ng-model="main.user.UserCode" required minlength="6" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">密码: </span>
+                        <input type="password" value="" class="form-control" placeholder="密码(必填项)" ng-model="main.user.Password" required minlength="6" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">确认: </span>
+                        <input type="password" value="" class="form-control" placeholder="密码确认(必填项)" ng-model="main.user.Repeat" required minlength="6" />
+                    </div>
+                    <hr />
+                    <div class="input-group">
+                        <span class="input-group-addon">姓名: </span>
+                        <input type="text" value="" class="form-control" placeholder="你的大名" ng-model="main.user.Name" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">性别: </span>
+                        <select class="form-control" ng-model="main.user.Gender">
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">地址: </span>
+                        <input type="text" value="" class="form-control" placeholder="你的地址" ng-model="main.user.Address" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">年龄: </span>
+                        <input type="number" value="" class="form-control" placeholder="你的年龄" ng-model="main.user.Age" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">简介: </span>
+                        <input type="text" value="" class="form-control" placeholder="一句话描述自己" ng-model="main.user.Signature" />
+                    </div>
+                    <span top-tip></span>
+                    <div style="margin-top: 20px; height: 50px;">
+                        <a href="/" class="btn btn-default pull-left">返回首页</a>
+                        <button class="btn btn-info pull-right" ng-click="main.register()" ng-disabled="BarberForm.$invalid">提交注册</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="/boot.users.barber.ng"></script>
+    <script>
+        amplify.subscribe('success.register.user', function () {
+            location.href = '/Users';
+        });
+    </script>
+}

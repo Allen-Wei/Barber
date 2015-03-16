@@ -1,0 +1,41 @@
+﻿<style type="text/css">
+    .input-group{ margin: 10px 0;}
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        <form name="UserForm" novalidate>
+            <div class="input-group">
+                <span class="input-group-addon">名字</span>
+                <input class="form-control" ng-model="Body.User.user.Name" required/>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">邮箱</span>
+                <input class="form-control" type="email" ng-model="Body.User.user.Email"  />
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">年龄</span>
+                <input class="form-control" type="number" ng-model="Body.User.user.Age" required />
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">性别</span>
+                <select class="form-control"  ng-model="Body.User.user.Gender">
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">地址</span>
+                <input class="form-control" ng-model="Body.User.user.Address" />
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">简介</span>
+                <input class="form-control" ng-model="Body.User.user.Signature" />
+            </div>
+            <div class="input-group" ng-show="Body.User.user.ThisIsBarber">
+                <span class="input-group-addon">店名</span>
+                <input class="form-control" ng-model="Body.User.user.Barberer.ShopName" />
+            </div>
+            <button value="提交" class="btn btn-default" ng-click="main.submit()" ng-disabled="UserForm.$invalid">更新</button>
+        </form>
+    </div>
+</div>

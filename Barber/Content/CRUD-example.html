@@ -1,0 +1,472 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>CRUD Example</title>
+    <link href="../Styles/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>
+                    The best practice
+                </h3>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-sm-12">
+                <h3>C# API</h3>
+<pre>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web;
+
+using Barber.Models;
+using Barber.Library;
+using ModelUser = Barber.Models.User;
+
+namespace Barber.API
+{
+    public class KeyValueController : ApiController
+    {
+        private BarberModel model = new BarberModel();
+      
+        public IEnumerable&lt;keyvalue&gt; Get()
+        {
+            return model.KeyValues;
+        }
+        public KeyValue Get(int id)
+        {
+            return model.KeyValues.FirstOrDefault(kv =&gt; kv.Id == id);
+        }
+        public IEnumerable&lt;keyvalue&gt; Get(int take, int skip)
+        {
+            var total = model.KeyValues.LongCount();
+            var pages = Math.Ceiling(Convert.ToDouble(total) / Convert.ToDouble(take));
+            HttpContext.Current.Response.AddHeader(&quot;X-Bar-Total&quot;, total.ToString());
+            HttpContext.Current.Response.AddHeader(&quot;X-Bar-Pages&quot;, pages.ToString());
+            return model.KeyValues.Skip(skip).Take(take);
+        }
+        public KeyValue Put(KeyValue entity)
+        {
+            model.KeyValues.InsertOnSubmit(entity);
+            model.SubmitChanges();
+            return entity;
+        }
+        public bool Post(KeyValue entity)
+        {
+            var query = this.Get(entity.Id);
+            if (query == null) { return false; }
+            query.Name = entity.Name;
+            query.Value = entity.Value;
+            query.Description = entity.Description;
+            query.Mark = entity.Mark;
+            model.SubmitChanges();
+            return true;
+        }
+        public bool Delete(int id)
+        {
+            var query = model.KeyValues.FirstOrDefault(kv =&gt; kv.Id == id);
+            model.KeyValues.DeleteOnSubmit(query);
+            model.SubmitChanges();
+            return true;
+        }
+    }
+}
+</pre>
+            </div>
+
+
+            <div class="col-sm-12">
+                <h3>JavaScript Service</h3>
+<pre>
+    angular.module('edu.services.keyvalue', [])
+    .factory('KeyValueSvc', function ($http, AppConstant) {
+        var service = {
+            getApi: function (append) {
+                return AppConstant.getApi({
+                    entity: '[API Controller Name]',
+                    params: append
+                });
+            },
+            get: function (id) {
+                var promise = $http({
+                    method: 'get',
+                    url: this.getApi(id)
+                });
+                return promise;
+            },
+            getAll: function () {
+                var promise = $http({
+                    method: 'get',
+                    url: this.getApi()
+                });
+                return promise;
+            },
+            getList: function (page) {
+                var take = AppConstant.perPage;
+                var skip = (page - 1) * take;
+                var promise = $http({
+                    method: 'get',
+                    url: this.getApi(),
+                    params: { take: take, skip: skip }
+                });
+                return promise;
+            },
+            add: function (entity) {
+                var promise = $http({
+                    method: 'PUT',
+                    url:this.getApi(),
+                    data: entity
+                });
+                return promise;
+            },
+            update: function (entity) {
+                var promise = $http({
+                    method: 'POST',
+                    url:this.getApi(),
+                    data: entity
+                });
+                return promise;
+            },
+            remove: function (id) {
+                var promise = $http({
+                    method: 'delete',
+                    url:this.getApi(id)
+                });
+                return promise;
+            }
+        };
+        return service;
+    });
+</pre>
+            </div>
+
+            <div class="col-sm-12">
+                <h3>JavaScript Controller</h3>
+<pre>
+    app.controller('KeyValueCtrl', function ($scope, KeyValueSvc) {
+        $scope.main = {
+            mode: 'list',
+            list: {
+                entities: [],
+                page: 1,
+                pages: 1,
+                total: 0,
+                remove: function (index) {
+                    var entity = this.entities[index];
+                    KeyValueSvc.remove(entity.Id).then(function (rep) {
+                        if (rep.data) {
+                            $scope.main.list.entities.splice(index, 1);
+                            $scope.main.list.total = $scope.main.list.total - 1;
+                        }
+                    });
+                },
+                load: function (p) {
+                    if (!p || p <= 0) { throw 'error page'; return;}
+                    KeyValueSvc.getList(p).then(function (rep) {
+                        $scope.main.list.entities = rep.data;
+                        var responsePages = parseInt(rep.headers('X-Edu-Pages'));
+                        $scope.main.list.pages = isNaN(responsePages) ? 1 : responsePages;
+                        var responseTotal = parseInt(rep.headers('X-Edu-Total'));
+                        $scope.main.list.total = isNaN(responseTotal) ? 1 : responseTotal;
+                    });
+                },
+                refresh: function () {
+                    this.load(this.page);
+                }
+            },
+            edit: {
+                entity: {},
+                show: function (index) {
+                    this.entity = $scope.main.list.entities[index];
+                    $scope.main.mode = 'edit';
+                },
+                submit: function () {
+                    KeyValueSvc.update(this.entity).then(function (rep) {
+                        $scope.main.mode = 'list';
+                    });
+                }
+            },
+            add: {
+                entity: {/* Name: '', Value: '', Description: '', Mark: '' */ },
+                show: function () {
+                    $scope.main.mode = 'add';
+                },
+                submit: function () {
+                    KeyValueSvc.add(this.entity).then(function (rep) {
+                        if (rep.data) {
+                            $scope.main.list.entities.push(rep.data);
+                            $scope.main.list.total = $scope.main.list.total + 1;
+                            $scope.main.mode = 'list';
+                            $scope.main.add.entity = {};
+                        }
+                    });
+                }
+            }
+        };
+        $scope.$watch('main.list.page', function (newVal) {
+            $scope.main.list.load(newVal);
+        });
+    });
+</pre>
+            </div>
+
+
+            <div class="col-sm-12">
+                <h3>Html Partial</h3>
+
+<pre>
+    
+&lt;!-- Item List --&gt;
+&lt;div class=&quot;row&quot; ng-show=&quot;main.mode == &#39;list&#39;&quot;&gt;
+    &lt;div class=&quot;col-sm-12&quot;&gt;
+        &lt;table class=&quot;table table-responsive&quot;&gt;
+            &lt;thead&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;#&lt;/th&gt;
+                    &lt;th&gt;Name&lt;/th&gt;
+                    &lt;th&gt;Value&lt;/th&gt;
+                    &lt;th&gt;Description&lt;/th&gt;
+                    &lt;th&gt;Mark&lt;/th&gt;
+                    &lt;th&gt;&lt;/th&gt;
+                &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+                &lt;tr ng-repeat=&quot;kv in main.list.entities&quot;&gt;
+                    &lt;td&gt;{{kv.Id}}&lt;/td&gt;
+                    &lt;td&gt;{{kv.Name}}&lt;/td&gt;
+                    &lt;td&gt;{{kv.Value}}&lt;/td&gt;
+                    &lt;td&gt;{{kv.Description}}&lt;/td&gt;
+                    &lt;td&gt;{{kv.Mark}}&lt;/td&gt;
+                    &lt;td&gt;
+                        &lt;button class=&quot;btn btn-danger btn-xs glyphicon glyphicon-remove&quot; ng-click=&quot;main.list.remove($index)&quot;&gt;&lt;/button&gt;
+                        &lt;button class=&quot;btn btn-info btn-xs glyphicon glyphicon-pencil&quot; ng-click=&quot;main.edit.show($index)&quot;&gt;&lt;/button&gt;
+                    &lt;/td&gt;
+                &lt;/tr&gt;
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;col-sm-12&quot;&gt;
+        &lt;button class=&quot;btn btn-default btn-sm fa fa-plus&quot; ng-click=&quot;main.add.show()&quot;&gt;&lt;/button&gt; |
+        &lt;button class=&quot;btn btn-default btn-sm fa fa-arrow-left&quot; ng-click=&quot;main.list.page = main.list.page - 1&quot; ng-disabled=&quot;main.list.page &lt;= 1&quot;&gt;&lt;/button&gt;
+        &lt;button class=&quot;btn btn-default btn-sm fa fa-arrow-right&quot; ng-click=&quot;main.list.page = main.list.page + 1&quot; ng-disabled=&quot;main.list.page &gt;= main.list.pages&quot;&gt;&lt;/button&gt; |
+        Page: {{main.list.page}}  Pages: {{main.list.pages}}  Total: {{main.list.total}}
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- Edit Item --&gt;
+&lt;div class=&quot;row&quot; ng-show=&quot;main.mode == &#39;edit&#39;&quot;&gt;
+    &lt;form role=&quot;form&quot;&gt;
+        &lt;div class=&quot;col-sm-12&quot;&gt;
+            &lt;h5 class=&quot;text-center&quot;&gt;编辑条目 &lt;i&gt;{{main.edit.entity.Name}}&lt;/i&gt;&lt;/h5&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Name
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.edit.entity.Name&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Value
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.edit.entity.Value&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Description
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.edit.entity.Description&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Mark
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.edit.entity.Mark&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-12&quot;&gt;
+            &lt;span ng-click=&quot;main.mode=&#39;list&#39;&quot; class=&quot;btn btn-default fa fa-arrow-left&quot; title=&quot;return&quot;&gt;&lt;/span&gt;
+            &lt;span class=&quot;btn btn-default fa fa-send&quot; ng-click=&quot;main.edit.submit()&quot;&gt;&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+&lt;/div&gt;
+&lt;!-- Add Item --&gt;
+&lt;div class=&quot;row&quot; ng-show=&quot;main.mode == &#39;add&#39;&quot;&gt;
+    &lt;form role=&quot;form&quot;&gt;
+        &lt;div class=&quot;col-sm-12&quot;&gt;
+            &lt;hr /&gt;
+            &lt;h5 class=&quot;text-center&quot;&gt;添加条目&lt;/i&gt;&lt;/h5&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Name
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.add.entity.Name&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Value
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.add.entity.Value&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Description
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.add.entity.Description&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-3&quot;&gt;
+            Mark
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-9&quot;&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control&quot; ng-model=&quot;main.add.entity.Mark&quot; /&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-12&quot;&gt;
+            &lt;span ng-click=&quot;main.mode=&#39;list&#39;&quot; class=&quot;btn btn-default fa fa-arrow-left&quot; title=&quot;return&quot;&gt;&lt;/span&gt;
+            &lt;span class=&quot;btn btn-default fa fa-send&quot; ng-click=&quot;main.add.submit()&quot;&gt;&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+&lt;/div&gt;
+</pre>
+
+                <hr />
+                <textarea class="form-control">
+
+                    <!-- Item List -->
+                    <div class="row" ng-show="main.mode == 'list'">
+                        <div class="col-sm-12">
+
+                            <table class="table table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                        <th>Mark</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="kv in main.list.entities">
+                                        <td>{{kv.Id}}</td>
+                                        <td>{{kv.Name}}</td>
+                                        <td>{{kv.Value}}</td>
+                                        <td>{{kv.Description}}</td>
+                                        <td>{{kv.Mark}}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-xs glyphicon glyphicon-remove" ng-click="main.list.remove($index)"></button>
+                                            <button class="btn btn-info btn-xs glyphicon glyphicon-pencil" ng-click="main.edit.show($index)"></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-12">
+                            <button class="btn btn-default btn-sm fa fa-plus" ng-click="main.add.show()"></button> |
+                            <button class="btn btn-default btn-sm fa fa-arrow-left" ng-click="main.list.page = main.list.page - 1" ng-disabled="main.list.page <= 1"></button>
+                            <button class="btn btn-default btn-sm fa fa-arrow-right" ng-click="main.list.page = main.list.page + 1" ng-disabled="main.list.page >= main.list.pages"></button> |
+                            Page: {{main.list.page}}  Pages: {{main.list.pages}}  Total: {{main.list.total}}
+                        </div>
+                    </div>
+
+                    <!-- Edit Item -->
+
+                    <div class="row" ng-show="main.mode == 'edit'">
+                        <form role="form">
+                            <div class="col-sm-12">
+                                <h5 class="text-center">编辑条目 <i>{{main.edit.entity.Name}}</i></h5>
+                            </div>
+                            <div class="col-sm-3">
+                                Name
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.edit.entity.Name" />
+                            </div>
+
+                            <div class="col-sm-3">
+                                Value
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.edit.entity.Value" />
+                            </div>
+
+
+                            <div class="col-sm-3">
+                                Description
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.edit.entity.Description" />
+                            </div>
+
+                            <div class="col-sm-3">
+                                Mark
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.edit.entity.Mark" />
+                            </div>
+                            <div class="col-sm-12">
+                                <span ng-click="main.mode='list'" class="btn btn-default fa fa-arrow-left" title="return"></span>
+                                <span class="btn btn-default fa fa-send" ng-click="main.edit.submit()"></span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Add Item -->
+                    <div class="row" ng-show="main.mode == 'add'">
+                        <form role="form">
+                            <div class="col-sm-12">
+                                <hr />
+                                <h5 class="text-center">添加条目</i></h5>
+                            </div>
+                            <div class="col-sm-3">
+                                Name
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.add.entity.Name" />
+                            </div>
+
+                            <div class="col-sm-3">
+                                Value
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.add.entity.Value" />
+                            </div>
+
+
+                            <div class="col-sm-3">
+                                Description
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.add.entity.Description" />
+                            </div>
+
+                            <div class="col-sm-3">
+                                Mark
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" ng-model="main.add.entity.Mark" />
+                            </div>
+                            <div class="col-sm-12">
+                                <span ng-click="main.mode='list'" class="btn btn-default fa fa-arrow-left" title="return"></span>
+                                <span class="btn btn-default fa fa-send" ng-click="main.add.submit()"></span>
+                            </div>
+                        </form>
+                    </div>
+
+
+                </textarea>
+
+            </div>
+
+
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Barber.Models.User
+
+@section header{
+    <script src="/angular.ng"></script>
+    <script src="/directives.topTip.ng"></script>
+    <script src="/services.ng"></script>
+}
+@section scripts{
+    <script src="/boot.users.profile.ng"></script>
+}
+
+<div class="container main" ng-app="ProfileApp" ng-controller="BodyCtrl">
+    <div class="row">
+        <div class="col-md-2 col-sm-12">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <a href="?filter=basic">基本资料</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="?filter=basic">更改头像</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10 col-sm-12">
+            <top-tip></top-tip>
+            <div ng-view></div>
+        </div>
+    </div>
+</div>
+
